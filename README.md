@@ -30,10 +30,10 @@ Hay dos formas: **por HACS** (recomendada si el repositorio es público en GitHu
 
 1. En Home Assistant abre **HACS**.
 2. Menú **⋮ → Repositorios personalizados**.
-3. Pega la URL del repositorio `https://github.com/inventaadm-dot/Inventa-homeassistan`,
+3. Pega la URL del repositorio `https://github.com/inventaadm-dot/Inventa-homeassistant`,
    elige el tipo **Dashboard** (en versiones antiguas de HACS: *Lovelace* / *Plugin*) y pulsa **Añadir**.
 4. Busca **Inventa Cards** en HACS → **Descargar** → elige la última versión.
-5. HACS registra el recurso solo (`/hacsfiles/Inventa-homeassistan/inventa-cards.js`).
+5. HACS registra el recurso solo (`/hacsfiles/Inventa-homeassistant/inventa-cards.js`).
    Si te lo pide, recarga el navegador (Ctrl + Shift + R).
 6. **Ajustes → Paneles → + Añadir panel → Paneles de la comunidad → Inventa.** Listo, sin código.
 
