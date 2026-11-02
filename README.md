@@ -18,21 +18,50 @@ Un solo archivo JavaScript, **sin dependencias** (no requiere button-card, card-
 
 ---
 
-## Instalación (manual, desde GitLab)
+## Instalación
 
-> HACS solo instala desde GitHub, por eso desde GitLab se instala a mano.
+Hay dos formas: **por HACS** (recomendada si el repositorio es público en GitHub) o **manual**
+(repositorio privado, GitLab o sin HACS). En ambas, al final se crea el panel igual.
 
-1. Descarga `inventa-cards.js` (carpeta `dist/` del último build o del release).
+### Opción A — Por HACS
+
+> Requisitos: [HACS](https://hacs.xyz) instalado y el repositorio **público en GitHub**.
+> HACS no instala desde repositorios privados ni desde GitLab.
+
+1. En Home Assistant abre **HACS**.
+2. Menú **⋮ → Repositorios personalizados**.
+3. Pega la URL del repositorio (por ejemplo `https://github.com/usuario/inventa-cards`),
+   elige el tipo **Dashboard** (en versiones antiguas de HACS: *Lovelace* / *Plugin*) y pulsa **Añadir**.
+4. Busca **Inventa Cards** en HACS → **Descargar** → elige la última versión.
+5. HACS registra el recurso solo (`/hacsfiles/inventa-cards/inventa-cards.js`).
+   Si te lo pide, recarga el navegador (Ctrl + Shift + R).
+6. **Ajustes → Paneles → + Añadir panel → Paneles de la comunidad → Inventa.** Listo, sin código.
+
+**Al actualizar:** HACS avisa cuando hay una versión nueva → **Actualizar** → recarga el navegador.
+No hay que tocar el `?v=`; HACS lo maneja.
+
+> **Para quien publica:** el repositorio debe tener `hacs.json` en la raíz y cada versión
+> publicada como **Release** de GitHub (por ejemplo `v0.14.0`) con el archivo
+> `inventa-cards.js` adjunto.
+
+### Opción B — Manual
+
+1. Descarga `inventa-cards.js` (del **Release** de la última versión, o de la carpeta `dist/`
+   si lo compilaste con `npm run build`).
 2. Cópialo en Home Assistant a `/config/www/inventa-cards/inventa-cards.js`
-   (con el complemento *File editor* o *Samba*).
+   (con el complemento *File editor*, *Studio Code Server* o *Samba*).
+   `/config/www/` se publica como `/local/`.
 3. **Ajustes → Paneles → ⋮ → Recursos → Añadir recurso**
    - URL: `/local/inventa-cards/inventa-cards.js?v=0.14.0`
    - Tipo: **Módulo JavaScript**
 4. Recarga el navegador (Ctrl + Shift + R).
 5. **Ajustes → Paneles → + Añadir panel → Paneles de la comunidad → Inventa.** Listo, sin código.
 
-**Al actualizar:** reemplaza el archivo y cambia el `?v=` del recurso (por ejemplo `?v=0.14.0`),
-si no, los navegadores siguen usando la versión anterior.
+**Al actualizar:** reemplaza el archivo y cambia el `?v=` del recurso por la versión nueva
+(por ejemplo `?v=0.15.0`); si no, los navegadores siguen usando la versión anterior.
+
+> No mezcles ambas formas: si instalas por HACS, borra el recurso manual `/local/inventa-cards/…`
+> para que la tarjeta no se cargue dos veces.
 
 ---
 
