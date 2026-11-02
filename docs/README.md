@@ -31,7 +31,6 @@
 | 5u | [Asistente](asistente.md) | Usuarios / instaladores | Qué entiende el buscador y cómo se limita a los equipos del panel |
 | 6 | [Guía de desarrollo](05-desarrollo.md) | Desarrollo | Entorno, página de pruebas, cómo crear una tarjeta nueva, convenciones, versiones |
 | 7 | [Hoja de ruta](06-hoja-de-ruta.md) | Todos | Etapas, catálogo de tarjetas y su estado, decisiones tomadas |
-| 8 | [Dashboard de la oficina (legado)](07-dashboard-oficina-legado.md) | Soporte Inventa | Cómo está hecho hoy el Corporate Dashboard de Inventa y su relación con este proyecto |
 | — | [Glosario](glosario.md) | Todos | Términos de Home Assistant y del proyecto |
 
 ## Convenciones de esta documentación
