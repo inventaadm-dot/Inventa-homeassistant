@@ -1,0 +1,2 @@
+# Inventa-homeassistan
+Template dashboard
