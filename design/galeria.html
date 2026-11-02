@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Galería de tarjetas</title>
+<style>
+:root, :root[data-theme="dark"] {
+  --bg:#0B1120; --card:#111A2E; --card2:#16213A; --line:#1F2A44;
+  --tx:#E6EDF7; --tx2:#94A3B8; --tx3:#64748B;
+  --acc:#3B82F6; --cyan:#22D3EE; --amb:#FBBF24; --heat:#F59E0B;
+  --ok:#4ADE80; --okbg:#0F2A1C; --wbg:#2A1F0B; --na:#F87171; --nabg:#2A1215;
+  --lon:#3A2E0E; --lonb:#5B4614; --pur:#A78BFA;
+}
+:root[data-theme="light"] {
+  --bg:#F4F6FA; --card:#FFFFFF; --card2:#F1F4F9; --line:#E3E8EF;
+  --tx:#0F172A; --tx2:#475569; --tx3:#94A3B8;
+  --acc:#2563EB; --cyan:#0891B2; --amb:#D97706; --heat:#D97706;
+  --ok:#15803D; --okbg:#DCFCE7; --wbg:#FEF3C7; --na:#DC2626; --nabg:#FEE2E2;
+  --lon:#FEF3C7; --lonb:#FCD34D; --pur:#7C3AED;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--tx); font:14px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+.wrap { max-width:1200px; margin:0 auto; padding:24px 16px 60px; }
+header.top { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:8px; }
+h1 { font-size:22px; font-weight:600; margin:0; }
+.sub { color:var(--tx2); margin:2px 0 0; font-size:13px; }
+.toggle { background:var(--card2); color:var(--tx); border:1px solid var(--line); border-radius:10px; padding:8px 14px; cursor:pointer; font:inherit; }
+h2 { font-size:15px; font-weight:600; margin:34px 0 4px; display:flex; align-items:center; gap:8px; }
+h2 .tag { font-size:11px; font-weight:500; padding:2px 8px; border-radius:999px; background:var(--card2); color:var(--tx2); border:1px solid var(--line); }
+h2 .tag.new { background:var(--okbg); color:var(--ok); border-color:transparent; }
+.desc { color:var(--tx3); font-size:12px; margin:0 0 12px; }
+.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:12px; }
+.grid.wide { grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); }
+.card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:14px 16px; min-width:0; }
+.lbl { font-size:12px; color:var(--tx2); }
+.big { font-size:26px; font-weight:500; }
+.muted { color:var(--tx3); font-size:12px; }
+.row { display:flex; align-items:center; gap:10px; }
+.sp { justify-content:space-between; }
+.pill { display:inline-flex; align-items:center; gap:5px; font-size:11px; padding:3px 9px; border-radius:999px; }
+.pill.ok { background:var(--okbg); color:var(--ok); }
+.pill.w { background:var(--wbg); color:var(--amb); }
+.pill.na { background:var(--nabg); color:var(--na); }
+.pill.n { background:var(--card2); color:var(--tx2); }
+svg.i { fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+svg.ic { width:18px; height:18px; flex:none; }
+.btn { width:40px; height:40px; border-radius:10px; background:var(--card2); border:1px solid var(--line); color:var(--tx2); display:grid; place-items:center; cursor:pointer; flex:none; }
+.btn svg.ic { width:18px; height:18px; }
+.lbl + svg.ic, .row.sp > svg.ic { width:16px; height:16px; }
+.bar { height:5px; border-radius:3px; background:var(--line); overflow:hidden; }
+.bar > i { display:block; height:100%; background:var(--acc); border-radius:3px; }
+.segs { display:flex; gap:4px; } .segs i { flex:1; height:5px; border-radius:3px; background:var(--line); } .segs i.on { background:var(--cyan); }
+.slider { position:relative; height:28px; border-radius:9px; background:var(--card2); border:1px solid var(--line); overflow:hidden; }
+.slider > i { position:absolute; inset:0 auto 0 0; background:color-mix(in srgb,var(--acc) 30%,transparent); border-right:2px solid var(--acc); }
+.slider > span { position:absolute; left:10px; top:50%; transform:translateY(-50%); font-size:12px; color:var(--tx); }
+.chips { display:flex; gap:6px; flex-wrap:wrap; }
+.chip { font-size:12px; padding:5px 12px; border-radius:999px; background:var(--card2); border:1px solid var(--line); color:var(--tx2); }
+.chip.on { background:var(--acc); border-color:var(--acc); color:#fff; }
+/* header */
+.hdr { display:grid; grid-template-columns:auto minmax(0,1fr) minmax(0,1.2fr) auto; align-items:center; gap:16px; }
+.hdr { padding:10px 16px; column-gap:18px; }
+.logo { height:52px; display:flex; align-items:center; font-weight:800; letter-spacing:1px; font-size:22px; color:var(--acc); padding-right:18px; border-right:1px solid var(--line); min-width:150px; }
+.usr .g { font-size:15px; font-weight:500; line-height:1.3; }
+.usr .muted { line-height:1.3; }
+.search { height:38px; border-radius:10px; background:var(--card2); border:1px solid var(--line); display:flex; align-items:center; gap:8px; padding:0 12px; color:var(--tx3); font-size:13px; }
+.search svg.ic { width:18px; height:18px; color:var(--tx3); }
+.acts { display:flex; gap:12px; }
+.acts .moon { color:var(--tx2); } :root[data-theme="light"] .acts .moon { color:var(--amb); }
+.badge { position:relative; } .badge::after { content:"3"; position:absolute; top:-6px; right:-6px; min-width:18px; height:18px; border-radius:999px; background:var(--heat); color:#fff; font-size:10px; font-weight:600; display:grid; place-items:center; border:2px solid var(--card); }
+@media (max-width:600px){ .hdr { grid-template-columns:minmax(0,1fr) auto; grid-template-areas:"l a" "u u" "s s"; } .hdr .logo{grid-area:l;border:none} .hdr .acts{grid-area:a} .hdr .usr{grid-area:u} .hdr .search{grid-area:s} }
+/* climate */
+.cl-g { display:block; width:170px; max-width:100%; margin:8px auto 0; }
+.cl-g text { font-family:inherit; }
+.cl-ctl { display:grid; grid-template-columns:36px minmax(0,1fr) 36px; gap:10px; align-items:center; margin-top:6px; }
+.btn.rnd { width:36px; height:36px; border-radius:50%; }
+.cl-now { height:36px; border-radius:999px; background:var(--card2); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; gap:5px; font-size:12px; color:var(--tx2); white-space:nowrap; }
+.cl-now b { font-weight:500; color:var(--tx); }
+.cl-line { margin:10px 0 2px; text-align:center; font-size:11px; color:var(--tx3); }
+.cl-modes { display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); gap:6px; margin-top:8px; }
+.cl-mode, .cl-pre { display:flex; align-items:center; justify-content:center; gap:5px; border:1px solid var(--line); background:var(--card2); color:var(--tx2); font-size:11px; white-space:nowrap; }
+.cl-mode { height:32px; border-radius:10px; } .cl-mode .ic { width:14px; height:14px; }
+.cl-mode.on { background:var(--acc); border-color:var(--acc); color:#fff; }
+.cl-pre { height:28px; border-radius:8px; } .cl-pre.on { border-color:var(--acc); color:var(--acc); }
+/* light */
+.lt { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:14px; background:var(--card); border:1px solid var(--line); }
+.lt .bulb { width:34px; height:34px; border-radius:10px; display:grid; place-items:center; background:var(--card2); color:var(--tx3); }
+.lt.on { border-color:var(--lonb); } .lt.on .bulb { background:var(--lon); color:var(--amb); }
+.lt.off-na { opacity:.5; }
+.lt .n { font-size:13px; } .lt .s { font-size:11px; color:var(--tx3); }
+/* weather */
+.wx { display:grid; grid-template-columns:1fr 1px 1.2fr; gap:14px; align-items:center; }
+.wx .sep { background:var(--line); align-self:stretch; }
+.fc { display:flex; justify-content:space-between; text-align:center; font-size:12px; }
+.fc b { display:block; font-weight:500; color:var(--tx); } .fc span { color:var(--tx3); }
+/* camera */
+.cam { padding:0; overflow:hidden; }
+.cam .img { aspect-ratio:16/9; background:linear-gradient(135deg,#1e293b,#0f172a 60%,#334155); position:relative; }
+.cam .img .live { position:absolute; top:10px; left:10px; } .cam .img .mo { position:absolute; top:10px; right:10px; }
+.cam .ft { padding:10px 14px; display:flex; justify-content:space-between; align-items:center; }
+.dot { width:7px; height:7px; border-radius:50%; background:var(--ok); display:inline-block; }
+/* events */
+.ev { padding:10px 12px; border-radius:12px; background:var(--card2); border:1px solid var(--line); border-left:3px solid var(--acc); }
+.ev .w { font-size:11px; color:var(--tx3); } .ev .t { font-size:13px; font-weight:500; }
+/* media */
+.media .art { width:56px; height:56px; border-radius:12px; background:linear-gradient(135deg,var(--acc),var(--pur)); flex:none; }
+.ctl { display:flex; justify-content:center; gap:14px; margin-top:10px; }
+.ctl .btn.main { width:44px; height:44px; background:var(--acc); color:#fff; border-color:var(--acc); border-radius:50%; }
+/* sensor spark */
+.spark { width:100%; height:44px; margin-top:6px; }
+/* binary */
+.bs.alert { border-color:color-mix(in srgb,var(--na) 50%,var(--line)); }
+.bs.alert .bulb { background:var(--nabg); color:var(--na); }
+/* person */
+.av { width:38px; height:38px; border-radius:50%; background:var(--card2); display:grid; place-items:center; font-weight:600; color:var(--tx2); position:relative; flex:none; }
+.av::after { content:""; position:absolute; right:-1px; bottom:-1px; width:11px; height:11px; border-radius:50%; background:var(--tx3); border:2px solid var(--card); }
+.av.home::after { background:var(--ok); }
+/* alarm */
+.keys { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-top:10px; }
+.keys span { padding:8px 0; text-align:center; border-radius:10px; background:var(--card2); border:1px solid var(--line); font-size:12px; color:var(--tx2); }
+.keys span.on { background:var(--okbg); color:var(--ok); border-color:transparent; }
+/* assistant / alerts panels */
+.panel .msg { padding:8px 12px; border-radius:12px; font-size:13px; margin:6px 0; max-width:85%; }
+.panel .me { background:var(--acc); color:#fff; margin-left:auto; border-bottom-right-radius:4px; }
+.panel .bot { background:var(--card2); border:1px solid var(--line); border-bottom-left-radius:4px; }
+.al { display:flex; gap:10px; padding:10px 0; border-top:1px solid var(--line); } .al:first-of-type { border-top:none; }
+.al .ic { color:var(--amb); } .al.crit .ic { color:var(--na); }
+.scene { display:flex; flex-direction:column; align-items:center; gap:6px; padding:14px 8px; text-align:center; }
+.scene .bulb { width:38px; height:38px; border-radius:12px; display:grid; place-items:center; background:color-mix(in srgb,var(--acc) 18%,var(--card2)); color:var(--acc); }
+footer { margin-top:40px; color:var(--tx3); font-size:12px; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/></symbol>
+  <symbol id="i-therm" viewBox="0 0 24 24"><path d="M14 14.8V5a2 2 0 0 0-4 0v9.8a4 4 0 1 0 4 0z"/></symbol>
+  <symbol id="i-fan" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><path d="M12 10c0-4 1-7 4-7s3 4 0 6M14 12c4 0 7 1 7 4s-4 3-6 0M12 14c0 4-1 7-4 7s-3-4 0-6M10 12c-4 0-7-1-7-4s4-3 6 0"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+  <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M17.5 19H8a5 5 0 1 1 1.1-9.9A6 6 0 0 1 20 11.5a3.8 3.8 0 0 1-2.5 7.5z"/></symbol>
+  <symbol id="i-blind" viewBox="0 0 24 24"><path d="M4 3h16M5 3v18M19 3v18M5 7h14M5 11h14M5 15h14"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+  <symbol id="i-unlock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.5-2"/></symbol>
+  <symbol id="i-door" viewBox="0 0 24 24"><path d="M5 21V4a1 1 0 0 1 1-1h9l4 2v16M3 21h18M13 12h.01"/></symbol>
+  <symbol id="i-smoke" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-motion" viewBox="0 0 24 24"><circle cx="13" cy="4" r="2"/><path d="M9 20l2-6 3 3v4M7 12l3-4 4 1 3 3"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></symbol>
+  <symbol id="i-vac" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="9" r="2"/><path d="M7 15h10"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></symbol>
+  <symbol id="i-prev" viewBox="0 0 24 24"><path d="M18 5L9 12l9 7zM6 5v14"/></symbol>
+  <symbol id="i-next" viewBox="0 0 24 24"><path d="M6 5l9 7-9 7zM18 5v14"/></symbol>
+  <symbol id="i-vol" viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4zM17 9a4 4 0 0 1 0 6"/></symbol>
+  <symbol id="i-thermo" viewBox="0 0 24 24"><path d="M14 14.8V5a2 2 0 0 0-4 0v9.8a4 4 0 1 0 4 0z"/></symbol>
+  <symbol id="i-power" viewBox="0 0 24 24"><path d="M12 3v9M6.3 6.3a8 8 0 1 0 11.4 0"/></symbol>
+  <symbol id="i-snow" viewBox="0 0 24 24"><path d="M12 2v20M3.3 7l17.4 10M3.3 17L20.7 7"/></symbol>
+  <symbol id="i-auto" viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 1-14.3 4.9M4 12a8 8 0 0 1 14.3-4.9M18 3v4h-4M6 21v-4h4"/></symbol>
+  <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+  <symbol id="i-stop" viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="1"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></symbol>
+  <symbol id="i-movie" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M8 5v14M16 5v14M3 12h18"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3l10 18H2zM12 10v4M12 17h.01"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></symbol>
+</svg>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Galería de tarjetas · borrador v1</h1>
+      <p class="sub">Maqueta estática para aprobar el diseño antes de programar. Nombre del paquete: por definir.</p>
+    </div>
+    <button class="toggle" id="t">Cambiar a modo claro</button>
+  </header>
+
+  <!-- ============ EXISTENTES ============ -->
+  <h2>Encabezado <span class="tag">existente</span></h2>
+  <p class="desc">Logo configurable (oscuro/claro), saludo dinámico, buscador del asistente y botones de acción. Se reorganiza en 3 filas bajo 600 px.</p>
+  <div class="card hdr">
+    <div class="logo"><svg class="i" style="width:26px;height:26px;margin-right:8px"><use href="#i-home"/></svg>Mi Casa</div>
+    <div class="usr"><div class="g">Buenas tardes, Ana</div><div class="muted">Resumen de tu casa hoy</div></div>
+    <div class="search"><svg class="ic i"><use href="#i-chat"/></svg>Buscar o pedir algo…</div>
+    <div class="acts">
+      <div class="btn"><svg class="ic i"><use href="#i-cal"/></svg></div>
+      <div class="btn moon"><svg class="ic i" id="modeIcon"><use href="#i-moon"/></svg></div>
+      <div class="btn badge"><svg class="ic i"><use href="#i-bell"/></svg></div>
+    </div>
+  </div>
+
+  <h2>Indicador de resumen <span class="tag">existente</span></h2>
+  <p class="desc">Agrega varias entidades: promedio, suma o "activos/total", con barra continua o segmentada.</p>
+  <div class="grid">
+    <div class="card"><div class="row sp"><span class="lbl">Temperatura promedio</span><svg class="ic i" style="color:var(--tx3)"><use href="#i-therm"/></svg></div><div class="big">23.1 °C</div><div class="bar" style="margin-top:6px"><i style="width:52%"></i></div></div>
+    <div class="card"><div class="row sp"><span class="lbl">Climas activos</span><svg class="ic i" style="color:var(--tx3)"><use href="#i-fan"/></svg></div><div class="big">3 <span style="font-size:14px;color:var(--tx2)">/ 4</span></div><div class="segs" style="margin-top:6px"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div></div>
+    <div class="card"><div class="row sp"><span class="lbl">Luces encendidas</span><svg class="ic i" style="color:var(--tx3)"><use href="#i-bulb"/></svg></div><div class="big">5 <span style="font-size:14px;color:var(--tx2)">/ 15</span></div><div class="segs" style="margin-top:6px"><i class="on" style="background:var(--amb)"></i><i class="on" style="background:var(--amb)"></i><i class="on" style="background:var(--amb)"></i><i class="on" style="background:var(--amb)"></i><i class="on" style="background:var(--amb)"></i><i></i><i></i><i></i><i></i><i></i></div></div>
+  </div>
+
+  <h2>Clima / termostato <span class="tag">existente</span></h2>
+  <p class="desc">Diseño del Corporate Dashboard: anillo con el objetivo (perilla) y el rango, temperatura actual entre los botones +/–, estado entendible ("Confortable", "Sala más caliente"), línea de advertencia ("⚠ 5.5 °C sobre el objetivo · revisar equipo" desde 3 °C, opción <code>alert</code>), <b>encendido/apagado</b> y los presets del equipo (Auto, Manual…). Los equipos que reportan mal (ej. Tuya ×5) se corrigen solos.</p>
+  <div class="grid">
+    <div class="card">
+      <div class="row sp"><b style="font-weight:500">Living</b><span class="pill ok">Confortable</span></div>
+      <svg class="cl-g" viewBox="0 0 120 104"><path d="M27.5 92.5 A46 46 0 1 1 92.5 92.5" fill="none" stroke="var(--line)" stroke-width="8" stroke-linecap="round"/><path d="M24.4 30.8 A46 46 0 0 1 29.1 25.9" fill="none" stroke="var(--ok)" stroke-width="8" stroke-linecap="round"/><circle cx="29.1" cy="25.9" r="3" fill="var(--ok)"/><circle cx="24.4" cy="30.8" r="6" fill="var(--card)" stroke="var(--tx)" stroke-width="2.5"/><text x="60" y="47" text-anchor="middle" font-size="9" fill="var(--tx3)">Objetivo</text><text x="60" y="72" text-anchor="middle" font-size="26" font-weight="500" fill="var(--tx)">21.0°</text><text x="25" y="102" text-anchor="middle" font-size="8" fill="var(--tx3)">16°</text><text x="95" y="102" text-anchor="middle" font-size="8" fill="var(--tx3)">32°</text></svg>
+      <div class="cl-ctl"><div class="btn rnd"><svg class="ic i"><use href="#i-minus"/></svg></div><div class="cl-now"><svg class="ic i" style="color:var(--ok)"><use href="#i-thermo"/></svg>Actual <b>21.5°</b></div><div class="btn rnd"><svg class="ic i"><use href="#i-plus"/></svg></div></div>
+      <div class="cl-line">Temperatura confortable</div>
+      <div class="cl-modes"><span class="cl-mode"><svg class="ic i"><use href="#i-power"/></svg>Apagado</span><span class="cl-mode on"><svg class="ic i"><use href="#i-snow"/></svg>Frío</span></div>
+      <div class="cl-modes"><span class="cl-pre on">Auto</span><span class="cl-pre">Manual</span></div>
+    </div>
+    <div class="card">
+      <div class="row sp"><b style="font-weight:500">Dormitorio</b><span class="pill w">Sala más caliente</span></div>
+      <svg class="cl-g" viewBox="0 0 120 104"><path d="M27.5 92.5 A46 46 0 1 1 92.5 92.5" fill="none" stroke="var(--line)" stroke-width="8" stroke-linecap="round"/><path d="M17.5 42.4 A46 46 0 0 1 79.7 18.4" fill="none" stroke="var(--heat)" stroke-width="8" stroke-linecap="round"/><circle cx="79.7" cy="18.4" r="3" fill="var(--heat)"/><circle cx="17.5" cy="42.4" r="6" fill="var(--card)" stroke="var(--tx)" stroke-width="2.5"/><text x="60" y="47" text-anchor="middle" font-size="9" fill="var(--tx3)">Objetivo</text><text x="60" y="72" text-anchor="middle" font-size="26" font-weight="500" fill="var(--tx)">20.0°</text><text x="25" y="102" text-anchor="middle" font-size="8" fill="var(--tx3)">16°</text><text x="95" y="102" text-anchor="middle" font-size="8" fill="var(--tx3)">32°</text></svg>
+      <div class="cl-ctl"><div class="btn rnd"><svg class="ic i"><use href="#i-minus"/></svg></div><div class="cl-now"><svg class="ic i" style="color:var(--heat)"><use href="#i-thermo"/></svg>Actual <b>25.5°</b></div><div class="btn rnd"><svg class="ic i"><use href="#i-plus"/></svg></div></div>
+      <div class="cl-line" style="color:var(--amb)">⚠ 5.5 °C sobre el objetivo · revisar equipo</div>
+      <div class="cl-modes"><span class="cl-mode"><svg class="ic i"><use href="#i-power"/></svg>Apagado</span><span class="cl-mode on"><svg class="ic i"><use href="#i-snow"/></svg>Frío</span></div>
+    </div>
+    <div class="card">
+      <div class="row sp"><b style="font-weight:500">Oficina</b><span class="pill n">Apagado</span></div>
+      <svg class="cl-g" viewBox="0 0 120 104"><path d="M27.5 92.5 A46 46 0 1 1 92.5 92.5" fill="none" stroke="var(--line)" stroke-width="8" stroke-linecap="round"/><circle cx="15.4" cy="48.8" r="3" fill="var(--tx3)"/><circle cx="34.4" cy="21.8" r="6" fill="var(--card)" stroke="var(--tx3)" stroke-width="2.5"/><text x="60" y="47" text-anchor="middle" font-size="9" fill="var(--tx3)">Objetivo</text><text x="60" y="72" text-anchor="middle" font-size="26" font-weight="500" fill="var(--tx3)">22.0°</text><text x="25" y="102" text-anchor="middle" font-size="8" fill="var(--tx3)">16°</text><text x="95" y="102" text-anchor="middle" font-size="8" fill="var(--tx3)">32°</text></svg>
+      <div class="cl-ctl"><div class="btn rnd"><svg class="ic i"><use href="#i-minus"/></svg></div><div class="cl-now"><svg class="ic i" style="color:var(--tx3)"><use href="#i-thermo"/></svg>Actual <b>19.5°</b></div><div class="btn rnd"><svg class="ic i"><use href="#i-plus"/></svg></div></div>
+      <div class="cl-line">Equipo apagado</div>
+      <div class="cl-modes"><span class="cl-mode on"><svg class="ic i"><use href="#i-power"/></svg>Apagado</span><span class="cl-mode"><svg class="ic i"><use href="#i-auto"/></svg>Calor/Frío</span></div>
+      <div class="cl-modes"><span class="cl-pre">Auto</span><span class="cl-pre on">Manual</span></div>
+    </div>
+  </div>
+
+  <h2>Luz / interruptor + chips de filtro <span class="tag">existente</span></h2>
+  <p class="desc">El ícono es el botón de encendido. Borde ámbar sutil al estar encendida. Se oculta sola si la entidad no está disponible (opcional).</p>
+  <div class="chips" style="margin-bottom:10px"><span class="chip on">Todas</span><span class="chip">Living</span><span class="chip">Cocina</span><span class="chip">Dormitorios</span><span class="chip">Exterior</span></div>
+  <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(170px,1fr))">
+    <div class="lt on"><div class="bulb"><svg class="ic i"><use href="#i-bulb"/></svg></div><div><div class="n">Living</div><div class="s">Encendida</div></div></div>
+    <div class="lt"><div class="bulb"><svg class="ic i"><use href="#i-bulb"/></svg></div><div><div class="n">Cocina</div><div class="s">Apagada</div></div></div>
+    <div class="lt on"><div class="bulb"><svg class="ic i"><use href="#i-bulb"/></svg></div><div style="flex:1;min-width:0"><div class="n">Comedor (dimmer)</div><div class="slider" style="height:6px;margin-top:5px;border:none"><i style="width:60%;background:var(--amb);border:none"></i></div></div></div>
+    <div class="lt off-na"><div class="bulb"><svg class="ic i"><use href="#i-bulb"/></svg></div><div><div class="n">Jardín</div><div class="s">Sin conexión</div></div></div>
+  </div>
+
+  <h2>Tiempo <span class="tag">existente</span></h2>
+  <p class="desc">Condición actual con ícono animado y pronóstico de los próximos días.</p>
+  <div class="grid wide"><div class="card wx">
+    <div><div class="muted">Casa</div><div class="row"><svg class="i" style="width:40px;height:40px;color:var(--amb)"><use href="#i-sun"/></svg><span style="font-size:34px">19°</span></div><div class="muted">Soleado</div></div>
+    <div class="sep"></div>
+    <div class="fc"><div><span>mar</span><svg class="i" style="width:26px;height:26px;color:var(--tx2);display:block;margin:4px auto"><use href="#i-cloud"/></svg><b>20°</b><span>11°</span></div><div><span>mié</span><svg class="i" style="width:26px;height:26px;color:var(--amb);display:block;margin:4px auto"><use href="#i-sun"/></svg><b>22°</b><span>12°</span></div><div><span>jue</span><svg class="i" style="width:26px;height:26px;color:var(--tx2);display:block;margin:4px auto"><use href="#i-cloud"/></svg><b>18°</b><span>10°</span></div></div>
+  </div></div>
+
+  <h2>Cámara <span class="tag">existente</span></h2>
+  <p class="desc">Imagen o video en vivo, indicador de movimiento y estado de conexión.</p>
+  <div class="grid wide">
+    <div class="card cam"><div class="img"><span class="pill n live"><span class="dot"></span> En vivo</span><span class="pill w mo">Movimiento</span></div><div class="ft"><span>Patio</span><span class="muted">hace 2 min</span></div></div>
+    <div class="card cam"><div class="img" style="background:var(--card2);display:grid;place-items:center"><span class="pill na">Sin conexión</span></div><div class="ft"><span>Garaje</span><span class="muted">—</span></div></div>
+  </div>
+
+  <h2>Próximos eventos <span class="tag">existente</span></h2>
+  <p class="desc">Lee todos los calendarios elegidos; colores por categoría (familia, tareas del hogar, feriado).</p>
+  <div class="card"><div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px">
+    <div class="ev" style="border-left-color:var(--ok)"><div class="w" style="color:var(--ok)">Ahora · hasta 11:00</div><div class="t">Clase de yoga</div><div class="w">Casa</div></div>
+    <div class="ev"><div class="w">Hoy · 15:00–16:00</div><div class="t">Cumpleaños de Sofía</div></div>
+    <div class="ev" style="border-left-color:var(--amb)"><div class="w">Mañana · 09:00–10:00</div><div class="t">Retiro de basura</div></div>
+    <div class="ev" style="border-left-color:var(--pur)"><div class="w">vie 31 oct · todo el día</div><div class="t">Día de las Iglesias Evangélicas</div></div>
+  </div></div>
+
+  <h2>Asistente y avisos <span class="tag">existente</span></h2>
+  <p class="desc">Asistente: interpreta pedidos sobre una lista cerrada de entidades, con lista de bloqueo configurable. Avisos: reglas configurables (humo, puerta abierta, batería baja, sin conexión, feriados…).</p>
+  <div class="grid wide">
+    <div class="card panel"><div class="row sp"><b style="font-weight:500">Asistente</b><span class="muted">Limpiar</span></div>
+      <div class="msg me">apaga las luces del living</div>
+      <div class="msg bot">Listo: apagué 2 luces (Living, Comedor).</div>
+      <div class="msg me">¿qué temperatura hay en el dormitorio?</div>
+      <div class="msg bot">El dormitorio está a 25.5 °C, con objetivo 20 °C.</div>
+    </div>
+    <div class="card panel"><div class="row sp"><b style="font-weight:500">Avisos</b><span class="pill w">3</span></div>
+      <div class="al crit"><svg class="ic i"><use href="#i-alert"/></svg><div><div>Humo detectado · Cocina</div><div class="muted">hace 1 min</div></div></div>
+      <div class="al"><svg class="ic i"><use href="#i-door"/></svg><div><div>Puerta principal abierta hace 14 min</div><div class="muted">Entrada</div></div></div>
+      <div class="al"><svg class="ic i"><use href="#i-bolt"/></svg><div><div>Batería baja (12 %) · Sensor de temperatura</div><div class="muted">Baño</div></div></div>
+    </div>
+  </div>
+
+  <!-- ============ NUEVAS ============ -->
+  <h2>Persianas / cortinas <span class="tag new">nueva</span></h2>
+  <p class="desc">Dominio <code>cover</code>: posición arrastrable y botones subir / detener / bajar.</p>
+  <div class="grid">
+    <div class="card"><div class="row sp"><div class="row"><svg class="ic i" style="color:var(--acc)"><use href="#i-blind"/></svg><b style="font-weight:500">Cortina Living</b></div><span class="muted">Abierta 65 %</span></div>
+      <div class="slider" style="margin:12px 0 10px"><i style="width:65%"></i><span>65 %</span></div>
+      <div class="row" style="justify-content:center"><div class="btn"><svg class="ic i"><use href="#i-up"/></svg></div><div class="btn"><svg class="ic i"><use href="#i-stop"/></svg></div><div class="btn"><svg class="ic i"><use href="#i-down"/></svg></div></div>
+    </div>
+  </div>
+
+  <h2>Ventilador <span class="tag new">nueva</span></h2>
+  <p class="desc">Dominio <code>fan</code>: encendido, velocidad por pasos y oscilación.</p>
+  <div class="grid">
+    <div class="card"><div class="row sp"><div class="row"><div class="lt on" style="padding:0;border:none;background:none"><div class="bulb" style="background:color-mix(in srgb,var(--cyan) 18%,var(--card2));color:var(--cyan)"><svg class="ic i"><use href="#i-fan"/></svg></div></div><div><b style="font-weight:500">Ventilador Dormitorio</b><div class="muted">Velocidad 2 de 4</div></div></div><span class="chip">Oscilar</span></div>
+      <div class="segs" style="margin-top:12px;gap:6px"><i class="on" style="height:22px;border-radius:7px"></i><i class="on" style="height:22px;border-radius:7px"></i><i style="height:22px;border-radius:7px"></i><i style="height:22px;border-radius:7px"></i></div>
+    </div>
+  </div>
+
+  <h2>Reproductor / TV <span class="tag new">nueva</span></h2>
+  <p class="desc">Dominio <code>media_player</code>: carátula, título, controles, volumen y fuente.</p>
+  <div class="grid wide">
+    <div class="card media"><div class="row"><div class="art"></div><div style="min-width:0"><b style="font-weight:500">TV Living</b><div class="muted">Netflix · Serie</div></div></div>
+      <div class="ctl"><div class="btn"><svg class="ic i"><use href="#i-prev"/></svg></div><div class="btn main"><svg class="ic i"><use href="#i-play"/></svg></div><div class="btn"><svg class="ic i"><use href="#i-next"/></svg></div></div>
+      <div class="row" style="margin-top:12px"><svg class="ic i" style="color:var(--tx3)"><use href="#i-vol"/></svg><div class="bar" style="flex:1"><i style="width:40%"></i></div><span class="muted">40</span></div>
+    </div>
+  </div>
+
+  <h2>Cerradura <span class="tag new">nueva</span></h2>
+  <p class="desc">Dominio <code>lock</code>: estado claro y confirmación antes de abrir.</p>
+  <div class="grid">
+    <div class="lt" style="padding:14px"><div class="bulb" style="background:var(--okbg);color:var(--ok)"><svg class="ic i"><use href="#i-lock"/></svg></div><div style="flex:1"><div class="n">Puerta principal</div><div class="s" style="color:var(--ok)">Cerrada</div></div><span class="chip">Abrir</span></div>
+    <div class="lt" style="padding:14px;border-color:color-mix(in srgb,var(--amb) 45%,var(--line))"><div class="bulb" style="background:var(--wbg);color:var(--amb)"><svg class="ic i"><use href="#i-unlock"/></svg></div><div style="flex:1"><div class="n">Puerta del garaje</div><div class="s" style="color:var(--amb)">Abierta hace 6 min</div></div><span class="chip">Cerrar</span></div>
+  </div>
+
+  <h2>Sensor con mini gráfico <span class="tag new">nueva</span></h2>
+  <p class="desc">Dominio <code>sensor</code>: valor actual, unidad, tendencia y historial de las últimas 24 h.</p>
+  <div class="grid">
+    <div class="card"><div class="row sp"><span class="lbl">Humedad Baño</span><span class="pill n">↑ 4 %</span></div><div class="big">58 <span style="font-size:14px;color:var(--tx2)">%</span></div>
+      <svg class="spark" viewBox="0 0 100 30" preserveAspectRatio="none"><path d="M0 22 L10 20 L20 21 L30 17 L40 18 L50 14 L60 15 L70 11 L80 13 L90 9 L100 10" style="fill:none;stroke:var(--cyan);stroke-width:1.6"/><path d="M0 22 L10 20 L20 21 L30 17 L40 18 L50 14 L60 15 L70 11 L80 13 L90 9 L100 10 L100 30 L0 30Z" style="fill:var(--cyan);opacity:.12"/></svg></div>
+    <div class="card"><div class="row sp"><span class="lbl">Consumo de la casa</span><span class="pill w">↑ 12 %</span></div><div class="big">2.4 <span style="font-size:14px;color:var(--tx2)">kW</span></div>
+      <svg class="spark" viewBox="0 0 100 30" preserveAspectRatio="none"><path d="M0 25 L10 24 L20 18 L30 20 L40 12 L50 15 L60 8 L70 12 L80 6 L90 9 L100 5" style="fill:none;stroke:var(--amb);stroke-width:1.6"/><path d="M0 25 L10 24 L20 18 L30 20 L40 12 L50 15 L60 8 L70 12 L80 6 L90 9 L100 5 L100 30 L0 30Z" style="fill:var(--amb);opacity:.12"/></svg></div>
+  </div>
+
+  <h2>Sensor binario <span class="tag new">nueva</span></h2>
+  <p class="desc">Dominio <code>binary_sensor</code>: puerta, movimiento, humo, agua… resalta en rojo/ámbar según la clase cuando está activo.</p>
+  <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr))">
+    <div class="lt bs"><div class="bulb"><svg class="ic i"><use href="#i-door"/></svg></div><div><div class="n">Puerta principal</div><div class="s">Cerrada · hace 1 h</div></div></div>
+    <div class="lt bs" style="border-color:color-mix(in srgb,var(--amb) 45%,var(--line))"><div class="bulb" style="background:var(--wbg);color:var(--amb)"><svg class="ic i"><use href="#i-motion"/></svg></div><div><div class="n">Pasillo</div><div class="s" style="color:var(--amb)">Movimiento</div></div></div>
+    <div class="lt bs alert"><div class="bulb"><svg class="ic i"><use href="#i-smoke"/></svg></div><div><div class="n">Humo Cocina</div><div class="s" style="color:var(--na)">¡Detectado!</div></div></div>
+  </div>
+
+  <h2>Presencia <span class="tag new">nueva</span></h2>
+  <p class="desc">Dominio <code>person</code> / <code>device_tracker</code>: avatar, en casa / fuera y desde cuándo.</p>
+  <div class="card"><div class="row" style="gap:18px;flex-wrap:wrap">
+    <div class="row"><div class="av home">AN</div><div><div>Ana</div><div class="muted" style="color:var(--ok)">En casa</div></div></div>
+    <div class="row"><div class="av home">SO</div><div><div>Sofía</div><div class="muted" style="color:var(--ok)">En casa</div></div></div>
+    <div class="row"><div class="av">PE</div><div><div>Pedro</div><div class="muted">Fuera · desde 18:40</div></div></div>
+  </div></div>
+
+  <h2>Alarma <span class="tag new">nueva</span></h2>
+  <p class="desc">Dominio <code>alarm_control_panel</code>: estado y modos (desarmada, en casa, ausente, noche).</p>
+  <div class="grid">
+    <div class="card"><div class="row sp"><div class="row"><svg class="ic i" style="color:var(--ok)"><use href="#i-shield"/></svg><b style="font-weight:500">Alarma Casa</b></div><span class="pill ok">Desarmada</span></div>
+      <div class="keys"><span class="on">Desarmar</span><span>En casa</span><span>Ausente</span><span>Noche</span><span>Vacaciones</span><span>Personal.</span></div></div>
+  </div>
+
+  <h2>Aspiradora <span class="tag new">nueva</span></h2>
+  <p class="desc">Dominio <code>vacuum</code>: estado, batería y acciones (iniciar, pausar, volver a la base).</p>
+  <div class="grid">
+    <div class="card"><div class="row sp"><div class="row"><svg class="ic i" style="color:var(--acc)"><use href="#i-vac"/></svg><b style="font-weight:500">Robot Aspiradora</b></div><span class="muted">Batería 82 %</span></div>
+      <div class="muted" style="margin:6px 0 10px">Limpiando · 14 min</div>
+      <div class="row"><div class="btn"><svg class="ic i"><use href="#i-stop"/></svg></div><div class="btn"><svg class="ic i"><use href="#i-play"/></svg></div><div class="btn"><svg class="ic i"><use href="#i-home"/></svg></div></div></div>
+  </div>
+
+  <h2>Escena / script <span class="tag new">nueva</span></h2>
+  <p class="desc">Dominios <code>scene</code>, <code>script</code>, <code>button</code>: acción rápida de un toque, con confirmación opcional.</p>
+  <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(130px,1fr))">
+    <div class="card scene"><div class="bulb"><svg class="ic i"><use href="#i-movie"/></svg></div><span>Noche de cine</span></div>
+    <div class="card scene"><div class="bulb"><svg class="ic i"><use href="#i-sun"/></svg></div><span>Buenos días</span></div>
+    <div class="card scene"><div class="bulb" style="background:color-mix(in srgb,var(--pur) 18%,var(--card2));color:var(--pur)"><svg class="ic i"><use href="#i-moon"/></svg></div><span>Buenas noches</span></div>
+  </div>
+
+  <footer>Borrador de diseño · los íconos finales serán los MDI de Home Assistant · los colores vendrán del tema activo.</footer>
+</div>
+<script>
+const b = document.getElementById('t'), r = document.documentElement;
+r.dataset.theme = 'dark';
+b.onclick = () => { const l = r.dataset.theme === 'dark'; r.dataset.theme = l ? 'light' : 'dark'; b.textContent = l ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro'; document.querySelector('#modeIcon use').setAttribute('href', l ? '#i-sun' : '#i-moon'); };
+</script>
+</body>
+</html>
