@@ -11,7 +11,7 @@
 // Los bloques vienen VACÍOS: el usuario elige en el editor (✏️) los equipos
 // que quiere mostrar (de cualquier tipo) y cada uno va solo a su bloque, en
 // el orden elegido. Orden fijo de bloques: Climatización · Luces · Persianas ·
-// Multimedia · Seguridad · Cámaras · Sensores · Personas · Aspiradoras ·
+// Multimedia · Seguridad · Cámaras · Riego · Sensores · Personas · Aspiradoras ·
 // Escenas y rutinas · Otros. Un bloque sin equipos no se muestra. Si los
 // equipos de un bloque son de varias áreas, aparecen chips para filtrar.
 // Calendario (subpágina): encabezado ← · mes + lista.
@@ -67,18 +67,26 @@ interface Block {
   filter?: boolean;
   /** Dominios del bloque; `match` permite reglas más finas. */
   domains: string[];
-  match?: (entityId: string, deviceClass?: string) => boolean;
+  match?: (entityId: string, deviceClass?: string, hass?: HomeAssistant) => boolean;
   /** Tarjeta para cada entidad (sin `type` → tarjeta genérica). */
   card: (entityId: string) => Record<string, any>;
 }
 
 const card = (name: string) => (entity: string) => ({ type: `${P}${name}-card`, entity });
 
+/** Interruptores de riego (p. ej. Hunter Hydrawise): van al bloque Riego, no a Luces. */
+function isWateringSwitch(entityId: string, hass?: HomeAssistant): boolean {
+  if (domain(entityId) !== 'switch') return false;
+  const tk = hass?.entities?.[entityId]?.translation_key || '';
+  return ['manual_watering', 'auto_watering'].includes(tk) || /_watering$/.test(entityId);
+}
+
 /** Orden fijo de los bloques. Cada entidad va al primero que la acepta. */
 const BLOCKS: Block[] = [
   { key: 'group_climate', icon: 'mdi:thermostat', minWidth: 250, domains: ['climate', 'fan', 'water_heater', 'humidifier'], card: (e) => (domain(e) === 'climate' ? card('climate')(e) : domain(e) === 'fan' ? card('fan')(e) : card('entity')(e)) },
-  { key: 'group_lights', icon: 'mdi:lightbulb-group-outline', minWidth: 190, filter: true, domains: ['light', 'switch', 'input_boolean'], card: card('light') },
+  { key: 'group_lights', icon: 'mdi:lightbulb-group-outline', minWidth: 190, filter: true, domains: ['light', 'switch', 'input_boolean'], match: (e, _dc, h) => !isWateringSwitch(e, h), card: card('light') },
   { key: 'group_covers', icon: 'mdi:window-shutter', minWidth: 240, domains: ['cover'], card: card('cover') },
+
   { key: 'group_media', icon: 'mdi:television-play', minWidth: 300, maxWidth: 700, domains: ['media_player', 'remote'], card: (e) => (domain(e) === 'media_player' ? card('media')(e) : card('entity')(e)) },
   {
     key: 'group_security', icon: 'mdi:shield-home-outline', minWidth: 200, domains: ['lock', 'alarm_control_panel', 'binary_sensor', 'siren'],
@@ -90,6 +98,12 @@ const BLOCKS: Block[] = [
     },
   },
   { key: 'group_cameras', icon: 'mdi:cctv', minWidth: 300, maxWidth: 800, domains: ['camera'], card: card('camera') },
+  // Riego: zonas (válvulas de agua) y sus interruptores de riego.
+  {
+    key: 'group_irrigation', icon: 'mdi:sprinkler-variant', minWidth: 260, filter: true, domains: ['valve', 'switch'],
+    match: (e, dc, h) => (domain(e) === 'valve' ? dc !== 'gas' : isWateringSwitch(e, h)),
+    card: card('irrigation'),
+  },
   { key: 'group_sensors', icon: 'mdi:chart-line', minWidth: 210, domains: ['sensor', 'binary_sensor'], card: (e) => (domain(e) === 'sensor' ? card('sensor')(e) : card('binary')(e)) },
   { key: 'group_people', icon: 'mdi:account-group-outline', minWidth: 200, domains: ['person', 'device_tracker'], card: card('person') },
   { key: 'group_vacuums', icon: 'mdi:robot-vacuum', minWidth: 240, domains: ['vacuum', 'lawn_mower'], card: card('vacuum') },
@@ -103,7 +117,7 @@ function distribute(ids: string[], hass?: HomeAssistant): Map<Block, string[]> {
   for (const id of ids) {
     const d = domain(id);
     const dc = hass?.states[id]?.attributes.device_class;
-    const block = BLOCKS.find((b) => b.domains.includes(d) && (!b.match || b.match(id, dc))) || OTHER;
+    const block = BLOCKS.find((b) => b.domains.includes(d) && (!b.match || b.match(id, dc, hass))) || OTHER;
     if (!out.has(block)) out.set(block, []);
     out.get(block)!.push(id);
   }
@@ -137,6 +151,8 @@ export function generateDashboard(config: InventaStrategyConfig, hass?: HomeAssi
   }
   if (lights.length) stats.push({ type: `${P}stat-card`, name: L('stat_lights'), icon: 'mdi:lightbulb-outline', entities: lights, mode: 'count' });
   if (climates.length) stats.push({ type: `${P}stat-card`, name: L('stat_climates'), icon: 'mdi:fan', entities: climates, mode: 'count' });
+  const valves = (blocks.get(BLOCKS.find((b) => b.key === 'group_irrigation')!) || []).filter((e) => domain(e) === 'valve');
+  if (valves.length) stats.push({ type: `${P}stat-card`, name: L('stat_irrigation'), icon: 'mdi:sprinkler-variant', entities: valves, mode: 'count' });
 
   const sections: Record<string, any>[] = [
     { type: 'grid', column_span: 4, cards: [{ type: `${P}header-card`, ...brand, ...(calEntities ? { calendar_entities: calEntities } : {}), calendar_path: 'calendario', alerts: true, alert_entities: chosen, assistant: true, assistant_entities: chosen, ...(config.assist_fallback ? { assist_fallback: true } : {}), ...forced }] },
