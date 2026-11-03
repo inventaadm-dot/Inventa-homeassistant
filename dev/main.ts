@@ -46,6 +46,42 @@ class HaIcon extends HTMLElement {
 customElements.define('ha-icon', HaIcon);
 
 // --- hass simulado ---------------------------------------------------------
+/** Fecha ISO dentro de `d` días a la hora indicada. */
+function inDays(d: number, h: number, m: number): string {
+  const x = new Date();
+  x.setDate(x.getDate() + d);
+  x.setHours(h, m, 0, 0);
+  return x.toISOString();
+}
+
+/** Entidades que crea Hunter Hydrawise por zona (mismos nombres que en HA). */
+function hydrawiseZone(slug: string, name: string, z: { open: boolean; auto: boolean; next: string | null; remaining: number; today: number; water?: number }) {
+  const out: Record<string, any> = {
+    [`valve.${slug}`]: st(`valve.${slug}`, z.open ? 'open' : 'closed', { friendly_name: name, device_class: 'water', supported_features: 3 }),
+    [`switch.${slug}_automatic_watering`]: st(`switch.${slug}_automatic_watering`, z.auto ? 'on' : 'off', { friendly_name: `${name} Automatic watering` }),
+    [`switch.${slug}_manual_watering`]: st(`switch.${slug}_manual_watering`, z.open ? 'on' : 'off', { friendly_name: `${name} Manual watering` }),
+    [`sensor.${slug}_next_cycle`]: st(`sensor.${slug}_next_cycle`, z.next || 'unknown', { friendly_name: `${name} Next cycle`, device_class: 'timestamp' }),
+    [`sensor.${slug}_remaining_watering_time`]: st(`sensor.${slug}_remaining_watering_time`, String(z.remaining), { friendly_name: `${name} Remaining watering time`, device_class: 'duration', unit_of_measurement: 'min' }),
+    [`sensor.${slug}_daily_active_watering_time`]: st(`sensor.${slug}_daily_active_watering_time`, String(z.today), { friendly_name: `${name} Daily active watering time`, device_class: 'duration', unit_of_measurement: 's' }),
+    [`binary_sensor.${slug}_watering`]: st(`binary_sensor.${slug}_watering`, z.open ? 'on' : 'off', { friendly_name: `${name} Watering`, device_class: 'running' }),
+  };
+  if (z.water !== undefined) out[`sensor.${slug}_daily_active_water_use`] = st(`sensor.${slug}_daily_active_water_use`, String(z.water), { friendly_name: `${name} Daily active water use`, device_class: 'water', unit_of_measurement: 'L' });
+  return out;
+}
+
+/** Registro de entidades de una zona Hydrawise (todas en el mismo dispositivo). */
+const TK: Record<string, string | undefined> = { automatic_watering: 'auto_watering', manual_watering: 'manual_watering', next_cycle: 'next_cycle', remaining_watering_time: 'watering_time', daily_active_watering_time: 'daily_active_water_time', daily_active_water_use: 'daily_active_water_use', watering: 'watering' };
+function hydrawiseRegistry(slug: string, states: Record<string, any>) {
+  const out: Record<string, any> = {};
+  for (const id of Object.keys(states)) {
+    const [, obj] = id.split('.');
+    if (obj !== slug && !obj.startsWith(`${slug}_`)) continue;
+    const suffix = obj.slice(slug.length + 1);
+    out[id] = { entity_id: id, device_id: `hw_${slug}`, platform: 'hydrawise', translation_key: TK[suffix] ?? null, area_id: slug.startsWith('p1') ? 'jardin' : 'canchas' };
+  }
+  return out;
+}
+
 const st = (entity_id: string, state: string, attributes: Record<string, any> = {}) => ({
   entity_id, state, attributes, last_changed: '2026-10-29T08:00:00Z', last_updated: '',
 });
@@ -105,6 +141,9 @@ const home = {
   'input_number.volumen': st('input_number.volumen', '30', { friendly_name: 'Volumen' }),
   'binary_sensor.puerta': st('binary_sensor.puerta', 'on', { friendly_name: 'Puerta principal', device_class: 'door' }),
   'weather.casa': st('weather.casa', 'sunny', { friendly_name: 'Casa', temperature: 19, humidity: 48 }),
+  ...hydrawiseZone('p1_cabecera', 'P1 - Cabecera', { open: false, auto: true, next: inDays(6, 8, 6), remaining: 0, today: 900 }),
+  ...hydrawiseZone('p1_norte_360', 'P1 norte 360', { open: true, auto: true, next: inDays(1, 8, 6), remaining: 12, today: 480, water: 136.4 }),
+  ...hydrawiseZone('canchas_6_y_7', 'Canchas 6 y 7', { open: false, auto: false, next: null, remaining: 0, today: 0 }),
 };
 
 const withCalendars = {
@@ -121,6 +160,8 @@ const hass: HomeAssistant = {
     living: { area_id: 'living', name: 'Living' },
     dormitorio: { area_id: 'dormitorio', name: 'Dormitorio' },
     cocina: { area_id: 'cocina', name: 'Cocina' },
+    jardin: { area_id: 'jardin', name: 'Jardín' },
+    canchas: { area_id: 'canchas', name: 'Canchas' },
   },
   entities: {
     'light.living': { entity_id: 'light.living', area_id: 'living' },
@@ -130,6 +171,9 @@ const hass: HomeAssistant = {
     'light.cocina': { entity_id: 'light.cocina', area_id: 'cocina' },
     'switch.terraza': { entity_id: 'switch.terraza', area_id: 'cocina' },
     'binary_sensor.puerta': { entity_id: 'binary_sensor.puerta', area_id: 'living' },
+    ...hydrawiseRegistry('p1_cabecera', home),
+    ...hydrawiseRegistry('p1_norte_360', home),
+    ...hydrawiseRegistry('canchas_6_y_7', home),
   },
   devices: { dev1: { id: 'dev1', area_id: 'dormitorio' } },
   connection: {
@@ -151,6 +195,8 @@ const hass: HomeAssistant = {
     let next = cur;
     if (s === 'toggle') next = { ...cur, state: cur.state === 'on' ? 'off' : 'on' };
     if (d === 'light' && s === 'turn_on') next = { ...cur, state: 'on', attributes: { ...cur.attributes, brightness: Math.round((data.brightness_pct / 100) * 255) } };
+    if (d === 'valve') next = { ...cur, state: s === 'open_valve' ? 'open' : 'closed' };
+    if (d === 'switch' && (s === 'turn_on' || s === 'turn_off')) next = { ...cur, state: s === 'turn_on' ? 'on' : 'off' };
     if (d === 'climate' && s === 'set_temperature') next = { ...cur, attributes: { ...cur.attributes, temperature: data.temperature } };
     // Como HA: un objeto hass nuevo en cada cambio (sin mutar el anterior).
     const h = { ...els[0].hass, states: { ...els[0].hass.states, [id]: next } };
@@ -213,6 +259,9 @@ const configs: Record<string, any> = {
   m1: { type: 'custom:inventa-climate-card', entity: 'climate.living' },
   m2: { type: 'custom:inventa-climate-card', entity: 'climate.dormitorio' },
   m3: { type: 'custom:inventa-climate-card', entity: 'climate.oficina' },
+  r1: { type: 'custom:inventa-irrigation-card', entity: 'valve.p1_cabecera' },
+  r2: { type: 'custom:inventa-irrigation-card', entity: 'valve.p1_norte_360' },
+  r3: { type: 'custom:inventa-irrigation-card', entity: 'switch.canchas_6_y_7_manual_watering' },
 };
 
 // eslint-disable-next-line prefer-const
@@ -232,6 +281,7 @@ const generated = generateDashboard(
       'climate.living', 'climate.dormitorio', 'climate.oficina', 'light.living', 'light.comedor', 'light.cocina', 'switch.terraza', 'light.pasillo',
       'cover.living', 'media_player.tv', 'camera.patio', 'camera.garaje', 'fan.dormitorio', 'lock.principal', 'lock.garaje', 'alarm_control_panel.casa', 'vacuum.robot', 'binary_sensor.puerta', 'binary_sensor.humo', 'binary_sensor.pasillo',
       'sensor.humedad_bano', 'sensor.consumo', 'person.ana', 'person.pedro', 'scene.cine', 'script.buenas_noches', 'input_number.volumen',
+      'valve.p1_cabecera', 'valve.p1_norte_360', 'switch.canchas_6_y_7_manual_watering',
     ],
   },
   hass,
