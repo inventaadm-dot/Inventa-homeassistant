@@ -17,9 +17,10 @@ import './cards/lock/lock-card';
 import './cards/alarm/alarm-card';
 import './cards/media/media-card';
 import './cards/vacuum/vacuum-card';
+import './cards/irrigation/irrigation-card';
 import './strategy/dashboard-strategy';
 
-const VERSION = '0.14.0';
+const VERSION = '0.15.0';
 
 declare global {
   interface Window {
@@ -58,6 +59,7 @@ window.customCards.push(
   { type: 'inventa-alarm-card', name: 'Inventa · Alarma', description: 'Estado y modos (desarmar, en casa, ausente, noche…).', preview: true },
   { type: 'inventa-media-card', name: 'Inventa · Reproductor / TV', description: 'Carátula, controles, volumen y encendido.', preview: true },
   { type: 'inventa-vacuum-card', name: 'Inventa · Aspiradora', description: 'Estado, batería e iniciar / pausar / volver a la base.', preview: true },
+  { type: 'inventa-irrigation-card', name: 'Inventa · Riego', description: 'Zona de riego (Hunter Hydrawise u otra válvula): próximo riego, tiempo restante, regar ahora y programa automático.', preview: true },
   { type: 'inventa-group-card', name: 'Inventa · Bloque', description: 'Título, chips de filtro por área y grilla de tarjetas (Climatización, Luces…).', preview: false },
 );
 

@@ -20,7 +20,7 @@ export interface HomeAssistant {
   callApi: <T>(method: 'GET' | 'POST', path: string, data?: Record<string, any>) => Promise<T>;
   /** Registro de áreas, entidades y dispositivos (lo trae el frontend de HA). */
   areas?: Record<string, { area_id: string; name: string; icon?: string | null; floor_id?: string | null }>;
-  entities?: Record<string, { entity_id: string; area_id?: string | null; device_id?: string | null; hidden?: boolean; entity_category?: string | null }>;
+  entities?: Record<string, { entity_id: string; area_id?: string | null; device_id?: string | null; hidden?: boolean; entity_category?: string | null; translation_key?: string | null; platform?: string }>;
   devices?: Record<string, { id: string; area_id?: string | null }>;
   callWS?: <T>(msg: Record<string, any>) => Promise<T>;
   /** Estado con formato e idioma de HA (2023.9+). */
