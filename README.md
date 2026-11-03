@@ -14,6 +14,7 @@ Un solo archivo JavaScript, **sin dependencias** (no requiere button-card, card-
 | Tiempo | `custom:inventa-weather-card` | ✅ v0.5 |
 | Luz / interruptor | `custom:inventa-light-card` | ✅ v0.5 |
 | Clima / termostato | `custom:inventa-climate-card` | ✅ v0.5 |
+| Riego (Hunter Hydrawise, válvulas de agua) | `custom:inventa-irrigation-card` | ✅ v0.15 |
 | Cámara, asistente, avisos, chips… | — | En diseño (ver `design/galeria.html`) |
 
 ---
@@ -41,7 +42,7 @@ Hay dos formas: **por HACS** (recomendada si el repositorio es público en GitHu
 No hay que tocar el `?v=`; HACS lo maneja.
 
 > **Para quien publica:** el repositorio debe tener `hacs.json` en la raíz y cada versión
-> publicada como **Release** de GitHub (por ejemplo `v0.14.0`) con el archivo
+> publicada como **Release** de GitHub (por ejemplo `v0.15.0`) con el archivo
 > `inventa-cards.js` adjunto.
 
 ### Opción B — Manual
@@ -52,7 +53,7 @@ No hay que tocar el `?v=`; HACS lo maneja.
    (con el complemento *File editor*, *Studio Code Server* o *Samba*).
    `/config/www/` se publica como `/local/`.
 3. **Ajustes → Paneles → ⋮ → Recursos → Añadir recurso**
-   - URL: `/local/inventa-cards/inventa-cards.js?v=0.14.0`
+   - URL: `/local/inventa-cards/inventa-cards.js?v=0.15.0`
    - Tipo: **Módulo JavaScript**
 4. Recarga el navegador (Ctrl + Shift + R).
 5. **Ajustes → Paneles → + Añadir panel → Paneles de la comunidad → Inventa.** Listo, sin código.
