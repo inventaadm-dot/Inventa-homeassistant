@@ -69,6 +69,29 @@ svg.ic { width:18px; height:18px; flex:none; }
 .acts .moon { color:var(--tx2); } :root[data-theme="light"] .acts .moon { color:var(--amb); }
 .badge { position:relative; } .badge::after { content:"3"; position:absolute; top:-6px; right:-6px; min-width:18px; height:18px; border-radius:999px; background:var(--heat); color:#fff; font-size:10px; font-weight:600; display:grid; place-items:center; border:2px solid var(--card); }
 @media (max-width:600px){ .hdr { grid-template-columns:minmax(0,1fr) auto; grid-template-areas:"l a" "u u" "s s"; } .hdr .logo{grid-area:l;border:none} .hdr .acts{grid-area:a} .hdr .usr{grid-area:u} .hdr .search{grid-area:s} }
+/* irrigation */
+.ir-ico { width:34px; height:34px; border-radius:10px; display:grid; place-items:center; background:var(--card2); color:var(--tx3); }
+.ir-ico.on { position:relative; background:var(--cyan); color:#fff; }
+.ir-ico.on::after { content:''; position:absolute; inset:-2px; border-radius:12px; border:2px solid var(--cyan); animation:ir-halo 1.8s ease-out infinite; }
+@keyframes ir-halo { from { opacity:.8; transform:scale(1); } to { opacity:0; transform:scale(1.45); } }
+.card.ir-on { border-color:var(--cyan); background:linear-gradient(160deg, color-mix(in srgb, var(--cyan) 16%, var(--card)) 0%, var(--card) 70%); box-shadow:0 0 0 1px color-mix(in srgb, var(--cyan) 35%, transparent), 0 6px 22px -10px var(--cyan); }
+.ir-on .ir-line b { color:var(--cyan); font-size:14px; }
+.pill.ir-run { background:var(--cyan); color:#fff; font-weight:500; display:inline-flex; align-items:center; gap:5px; }
+.ir-dot { width:6px; height:6px; border-radius:50%; background:#fff; animation:ir-blink 1.2s ease-in-out infinite; }
+@keyframes ir-blink { 50% { opacity:.3; } }
+.ir-flow { height:6px; margin-top:8px; border-radius:3px; background:var(--line); overflow:hidden; }
+.ir-fill { height:100%; border-radius:3px; background:repeating-linear-gradient(110deg, var(--cyan) 0 10px, color-mix(in srgb, var(--cyan) 60%, #fff) 10px 20px); background-size:200% 100%; animation:ir-run 1.4s linear infinite; }
+@keyframes ir-run { to { background-position:-42px 0; } }
+.ir-line { margin-top:10px; font-size:12px; color:var(--tx2); } .ir-line b { font-weight:500; color:var(--tx); }
+.ir-facts { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+.ir-fact { display:inline-flex; align-items:center; gap:5px; height:26px; padding:0 9px; border-radius:999px; background:var(--card2); border:1px solid var(--line); font-size:11px; color:var(--tx2); }
+.ir-fact .ic { width:14px; height:14px; color:var(--tx3); } .ir-fact b { font-weight:500; color:var(--tx); }
+.ir-btns { display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); gap:6px; margin-top:10px; }
+.ir-act { height:34px; display:flex; align-items:center; justify-content:center; gap:6px; border-radius:10px; border:1px solid var(--line); background:var(--card2); color:var(--tx2); font-size:12px; white-space:nowrap; }
+.ir-act .ic { width:15px; height:15px; }
+.ir-act.go { background:var(--acc); border-color:var(--acc); color:#fff; }
+.ir-act.stop { background:var(--cyan); border-color:var(--cyan); color:#fff; }
+.ir-act.sched.on { border-color:var(--ok); color:var(--ok); }
 /* climate */
 .cl-g { display:block; width:170px; max-width:100%; margin:8px auto 0; }
 .cl-g text { font-family:inherit; }
@@ -157,6 +180,8 @@ footer { margin-top:40px; color:var(--tx3); font-size:12px; }
   <symbol id="i-power" viewBox="0 0 24 24"><path d="M12 3v9M6.3 6.3a8 8 0 1 0 11.4 0"/></symbol>
   <symbol id="i-snow" viewBox="0 0 24 24"><path d="M12 2v20M3.3 7l17.4 10M3.3 17L20.7 7"/></symbol>
   <symbol id="i-auto" viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 1-14.3 4.9M4 12a8 8 0 0 1 14.3-4.9M18 3v4h-4M6 21v-4h4"/></symbol>
+  <symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 3s6 6.6 6 11a6 6 0 0 1-12 0c0-4.4 6-11 6-11z"/></symbol>
+  <symbol id="i-timer" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></symbol>
   <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
   <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
   <symbol id="i-up" viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></symbol>
@@ -350,6 +375,24 @@ footer { margin-top:40px; color:var(--tx3); font-size:12px; }
     <div class="card"><div class="row sp"><div class="row"><svg class="ic i" style="color:var(--acc)"><use href="#i-vac"/></svg><b style="font-weight:500">Robot Aspiradora</b></div><span class="muted">Batería 82 %</span></div>
       <div class="muted" style="margin:6px 0 10px">Limpiando · 14 min</div>
       <div class="row"><div class="btn"><svg class="ic i"><use href="#i-stop"/></svg></div><div class="btn"><svg class="ic i"><use href="#i-play"/></svg></div><div class="btn"><svg class="ic i"><use href="#i-home"/></svg></div></div></div>
+  </div>
+
+  <h2>Riego <span class="tag new">nueva</span></h2>
+  <p class="desc">Dominio <code>valve</code> (zonas de <b>Hunter Hydrawise</b> u otra válvula de agua): estado, próximo riego o tiempo restante, cuánto se regó hoy, <b>Regar ahora / Detener</b> y el programa automático. Mientras riega se destaca en <b>color agua</b>: borde y fondo teñidos, ícono con halo que late, píldora "Regando" y barra con el agua que corre y se vacía según el tiempo restante. Tocar la tarjeta no riega; mantener abre los detalles.</p>
+  <div class="grid">
+    <div class="card"><div class="row sp"><div class="row"><span class="ir-ico"><svg class="ic i"><use href="#i-drop"/></svg></span><b style="font-weight:500">P1 - Cabecera</b></div><span class="pill n">En espera</span></div>
+      <div class="ir-line">Próximo riego <b>lun 9 nov, 08:06</b> <span class="muted">· en 6 días</span></div>
+      <div class="ir-facts"><span class="ir-fact"><svg class="ic i"><use href="#i-timer"/></svg>Hoy <b>15 min</b></span></div>
+      <div class="ir-btns"><span class="ir-act go"><svg class="ic i"><use href="#i-play"/></svg>Regar ahora</span><span class="ir-act sched on"><svg class="ic i"><use href="#i-cal"/></svg>Automático</span></div></div>
+    <div class="card ir-on"><div class="row sp"><div class="row"><span class="ir-ico on"><svg class="ic i"><use href="#i-drop"/></svg></span><b style="font-weight:500">P1 norte 360</b></div><span class="pill ir-run"><i class="ir-dot"></i>Regando</span></div>
+      <div class="ir-line">Quedan <b>12 min</b></div>
+      <div class="ir-flow"><div class="ir-fill" style="width:62%"></div></div>
+      <div class="ir-facts"><span class="ir-fact"><svg class="ic i"><use href="#i-timer"/></svg>Hoy <b>8 min</b></span><span class="ir-fact"><svg class="ic i"><use href="#i-drop"/></svg>Agua hoy <b>136 L</b></span></div>
+      <div class="ir-btns"><span class="ir-act stop"><svg class="ic i"><use href="#i-stop"/></svg>Detener</span><span class="ir-act sched on"><svg class="ic i"><use href="#i-cal"/></svg>Automático</span></div></div>
+    <div class="card"><div class="row sp"><div class="row"><span class="ir-ico"><svg class="ic i"><use href="#i-drop"/></svg></span><b style="font-weight:500">Canchas 6 y 7</b></div><span class="pill w">Suspendido</span></div>
+      <div class="ir-line muted">Programa automático suspendido</div>
+      <div class="ir-facts"><span class="ir-fact"><svg class="ic i"><use href="#i-timer"/></svg>Hoy <b>0 min</b></span></div>
+      <div class="ir-btns"><span class="ir-act go"><svg class="ic i"><use href="#i-play"/></svg>Regar ahora</span><span class="ir-act sched"><svg class="ic i"><use href="#i-cal"/></svg>Automático</span></div></div>
   </div>
 
   <h2>Escena / script <span class="tag new">nueva</span></h2>
