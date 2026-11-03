@@ -38,6 +38,7 @@ Antes de instalar en un Home Assistant real, cada etapa se valida en la página 
 | Presencia | `inventa-person-card` | `person`, `device_tracker` | Nueva | ✅ v0.10 |
 | Alarma | `inventa-alarm-card` | `alarm_control_panel` | Nueva | ✅ v0.11 |
 | Aspiradora | `inventa-vacuum-card` | `vacuum` | Nueva | ✅ v0.11 |
+| Riego | `inventa-irrigation-card` | `valve` (+ Hunter Hydrawise) | Nueva | ✅ v0.15 |
 | Escena / script | `inventa-action-card` | `scene`, `script`, `button` | Nueva | ✅ v0.10 |
 | Entidad (genérica) | `inventa-entity-card` | cualquiera | Nueva | ✅ v0.10 |
 
@@ -73,6 +74,7 @@ Antes de instalar en un Home Assistant real, cada etapa se valida en la página 
 | 29-10-2026 | v0.2.0 instalada (fondo + agenda) ✅ |
 | 29-10-2026 | Conservar la vista mes + lista del Corporate Dashboard como opción `view` de la tarjeta Calendario; encabezado con modo subpágina |
 | 29-10-2026 | El indicador "Sala de Reuniones disponible" se generalizará después como **indicador de recurso** opcional |
+| 03-11-2026 | v0.15.0: **tarjeta de riego** (`inventa-irrigation-card`) para Hunter Hydrawise y cualquier válvula de agua: próximo riego, tiempo restante, regado hoy, agua usada, **Regar ahora / Detener** y programa **Automático**; bloque **Riego** e indicador **Zonas regando** en el panel |
 | 02-11-2026 | v0.14.0: **tarjeta de clima con el diseño del Corporate Dashboard**: perilla del objetivo y rango 16–32°, píldora "Actual", línea de advertencia ("⚠ … sobre el objetivo · revisar equipo", opción `alert`), botones **Apagado / modo** y presets del equipo; luces siempre con ícono de ampolleta |
 | 02-11-2026 | v0.13.0: **corrección automática de climas que reportan mal** (regla para cualquier entidad, no solo Tuya): se detecta por la temperatura máxima; aplica en tarjeta de clima, resumen, avisos y asistente; el campo del editor queda solo para forzarla |
 | 02-11-2026 | v0.12.1: en escritorio los bloques **estiran sus tarjetas** para ocupar todo el ancho (sin columnas vacías); cámaras y TV con ancho máximo; celular sin cambios |

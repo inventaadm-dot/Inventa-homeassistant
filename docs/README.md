@@ -27,6 +27,7 @@
 | 5q | [Referencia: Alarma](tarjetas/alarma.md) | Usuarios / instaladores | `inventa-alarm-card` |
 | 5r | [Referencia: Reproductor / TV](tarjetas/reproductor.md) | Usuarios / instaladores | `inventa-media-card` |
 | 5s | [Referencia: Aspiradora](tarjetas/aspiradora.md) | Usuarios / instaladores | `inventa-vacuum-card` |
+| 5v | [Referencia: Riego](tarjetas/riego.md) | Usuarios / instaladores | `inventa-irrigation-card` (Hunter Hydrawise y válvulas de agua) |
 | 5t | [Avisos (campana)](avisos.md) | Usuarios / instaladores | Reglas y niveles de la 🔔 |
 | 5u | [Asistente](asistente.md) | Usuarios / instaladores | Qué entiende el buscador y cómo se limita a los equipos del panel |
 | 6 | [Guía de desarrollo](05-desarrollo.md) | Desarrollo | Entorno, página de pruebas, cómo crear una tarjeta nueva, convenciones, versiones |
