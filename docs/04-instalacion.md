@@ -26,12 +26,12 @@
    servirla como `/local/`.
 3. **Registrar el recurso**
    **Ajustes → Paneles → ⋮ (arriba a la derecha) → Recursos → Añadir recurso**
-   - URL: `/local/inventa-cards/inventa-cards.js?v=0.15.1`
+   - URL: `/local/inventa-cards/inventa-cards.js?v=0.15.2`
    - Tipo de recurso: **Módulo JavaScript**
 4. **Recargar el navegador** con **Ctrl + Shift + R** (en la app Companion:
    **Ajustes → Companion app → Depuración → Restablecer caché del frontend**).
 5. **Comprobar**: abre la consola del navegador (F12). Debe aparecer
-   `INVENTA-CARDS v0.15.1`. En el editor de un panel, **Añadir tarjeta** → buscar "Inventa".
+   `INVENTA-CARDS v0.15.2`. En el editor de un panel, **Añadir tarjeta** → buscar "Inventa".
 
 ## Crear el panel "Inventa" (sin código)
 
@@ -91,7 +91,7 @@ El panel se arma solo:
   nombre.
 
 > **Si "Inventa" no aparece** en *Paneles de la comunidad*: revisa que el recurso esté cargado
-> (consola: `INVENTA-CARDS v0.15.1`) y recarga con Ctrl + Shift + R. Como respaldo, crea un panel
+> (consola: `INVENTA-CARDS v0.15.2`) y recarga con Ctrl + Shift + R. Como respaldo, crea un panel
 > vacío, abre **✏️ → ⋮ → Editor de configuración en texto** y deja solo esta línea:
 > `strategy: { type: custom:inventa }`
 
@@ -126,7 +126,7 @@ Todas estas opciones también se cambian desde el editor visual del panel (✏�
 ## Actualización
 
 1. Reemplaza `/config/www/inventa-cards/inventa-cards.js` por la versión nueva.
-2. En **Recursos**, edita la URL y cambia el número: `?v=0.12.0` → `?v=0.15.1`.
+2. En **Recursos**, edita la URL y cambia el número: `?v=0.12.0` → `?v=0.15.2`.
 3. Recarga con Ctrl + Shift + R en cada dispositivo (o restablece la caché de la app).
 
 > **¿Por qué cambiar `?v=`?** Home Assistant entrega `/local/` con caché de 31 días. Si la URL no
