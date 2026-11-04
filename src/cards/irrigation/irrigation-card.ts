@@ -58,6 +58,12 @@ export class InventaIrrigationCard extends LitElement {
   /** Entidades del dispositivo de la zona, por dato (se recalcula si cambia el registro). */
   private _roles: Partial<Record<Role, string>> = {};
   private _rolesFrom?: unknown;
+  /** Orden enviada y aún sin respuesta del equipo (para mostrar "Enviando…"). */
+  @state() private _busy?: 'water' | 'sched';
+  /** Error de la última orden (Home Assistant no lo muestra solo). */
+  @state() private _error = '';
+  private _busyTimer?: number;
+  private _errorTimer?: number;
   /** Mayor tiempo restante visto en este riego (para la barra de avance). */
   private _runMax?: number;
 
@@ -127,6 +133,7 @@ export class InventaIrrigationCard extends LitElement {
   protected shouldUpdate(changed: PropertyValues): boolean {
     if (!changed.has('hass') || changed.size > 1) return true;
     const old = changed.get('hass') as HomeAssistant | undefined;
+    if (this._busy) return true;
     if (!old || old.entities !== this.hass?.entities || old.locale?.language !== this.hass?.locale?.language) return true;
     return this._watched().some((e) => old.states[e] !== this.hass?.states[e]);
   }
@@ -157,19 +164,54 @@ export class InventaIrrigationCard extends LitElement {
     return this._st('manual')?.state === 'on' || this._st('running')?.state === 'on' || (this._num('remaining') || 0) > 0;
   }
 
+  /**
+   * Envía la orden y muestra "Enviando…" hasta que el equipo responda (o 45 s).
+   * Si Home Assistant la rechaza, el motivo se muestra en la tarjeta.
+   */
+  private async _send(kind: 'water' | 'sched', domain_: string, service: string, entityId: string): Promise<void> {
+    const h = this.hass;
+    if (!h || this._busy) return;
+    this._busy = kind;
+    this._error = '';
+    window.clearTimeout(this._busyTimer);
+    this._busyTimer = window.setTimeout(() => (this._busy = undefined), 45000);
+    try {
+      await h.callService(domain_, service, { entity_id: entityId });
+    } catch (err: any) {
+      window.clearTimeout(this._busyTimer);
+      this._busy = undefined;
+      this._error = t(h, 'ir_failed', { msg: err?.message || err?.error || String(err) });
+      window.clearTimeout(this._errorTimer);
+      this._errorTimer = window.setTimeout(() => (this._error = ''), 10000);
+      console.warn('inventa-irrigation-card', domain_, service, entityId, err);
+    }
+  }
+
   private _water(e: Event, on: boolean): void {
     stop(e);
-    const h = this.hass;
-    if (!h) return;
+    // Hydrawise: el interruptor "Manual watering" riega con un tiempo fijo y es lo
+    // más confiable; la válvula queda para las demás integraciones.
+    const manual = this._roles.manual;
     const valve = this._roles.valve;
-    if (valve) h.callService('valve', on ? 'open_valve' : 'close_valve', { entity_id: valve });
-    else if (this._roles.manual) h.callService('switch', on ? 'turn_on' : 'turn_off', { entity_id: this._roles.manual });
+    if (manual) this._send('water', 'switch', on ? 'turn_on' : 'turn_off', manual);
+    else if (valve) this._send('water', 'valve', on ? 'open_valve' : 'close_valve', valve);
   }
 
   private _toggleSchedule(e: Event): void {
     stop(e);
     const id = this._roles.auto;
-    if (id) this.hass?.callService('switch', this.hass.states[id]?.state === 'on' ? 'turn_off' : 'turn_on', { entity_id: id });
+    if (id) this._send('sched', 'switch', this.hass?.states[id]?.state === 'on' ? 'turn_off' : 'turn_on', id);
+  }
+
+  protected updated(changed: PropertyValues): void {
+    // El equipo respondió: se quita "Enviando…".
+    const old = changed.get('hass') as HomeAssistant | undefined;
+    if (!this._busy || !old) return;
+    const ids = this._busy === 'sched' ? [this._roles.auto] : [this._roles.valve, this._roles.manual, this._roles.running];
+    if (ids.some((id) => id && old.states[id]?.state !== this.hass?.states[id]?.state)) {
+      window.clearTimeout(this._busyTimer);
+      this._busy = undefined;
+    }
   }
 
   /** "12 min", "1 h 5 min", "45 s". */
@@ -247,6 +289,7 @@ export class InventaIrrigationCard extends LitElement {
         ${pill}
       </div>
       <div class="line">${main1}</div>
+      ${this._error ? html`<div class="err">${this._error}</div>` : nothing}
       ${running ? html`<div class="flow" role="presentation"><div class="fill" style="width:${pct}%"></div></div>` : nothing}
       ${today !== undefined || water !== undefined
         ? html`<div class="facts">
@@ -262,13 +305,17 @@ export class InventaIrrigationCard extends LitElement {
         ? nothing
         : html`<div class="btns">
             ${canWater
-              ? html`<button class="act ${running ? 'stop' : 'go'}" @pointerdown=${stop} @click=${(e: Event) => this._water(e, !running)}>
-                  <ha-icon .icon=${running ? 'mdi:stop' : 'mdi:play'}></ha-icon>${running ? t(h, 'stop') : t(h, 'ir_start')}
+              ? html`<button class="act ${running ? 'stop' : 'go'}" ?disabled=${!!this._busy} @pointerdown=${stop} @click=${(e: Event) => this._water(e, !running)}>
+                  ${this._busy === 'water'
+                    ? html`<ha-icon icon="mdi:timer-sand"></ha-icon>${t(h, 'ir_sending')}`
+                    : html`<ha-icon .icon=${running ? 'mdi:stop' : 'mdi:play'}></ha-icon>${running ? t(h, 'stop') : t(h, 'ir_start')}`}
                 </button>`
               : nothing}
             ${c.show_schedule !== false && auto && !isUnavailable(auto)
-              ? html`<button class="act sched ${suspended ? '' : 'on'}" aria-pressed=${suspended ? 'false' : 'true'} @pointerdown=${stop} @click=${this._toggleSchedule}>
-                  <ha-icon .icon=${suspended ? 'mdi:calendar-remove-outline' : 'mdi:calendar-clock-outline'}></ha-icon>${t(h, 'ir_schedule')}
+              ? html`<button class="act sched ${suspended ? '' : 'on'}" aria-pressed=${suspended ? 'false' : 'true'} ?disabled=${!!this._busy} @pointerdown=${stop} @click=${this._toggleSchedule}>
+                  ${this._busy === 'sched'
+                    ? html`<ha-icon icon="mdi:timer-sand"></ha-icon>${t(h, 'ir_sending')}`
+                    : html`<ha-icon .icon=${suspended ? 'mdi:calendar-remove-outline' : 'mdi:calendar-clock-outline'}></ha-icon>${t(h, 'ir_schedule')}`}
                 </button>`
               : nothing}
           </div>`}
@@ -463,6 +510,15 @@ export class InventaIrrigationCard extends LitElement {
       .act.sched.on {
         border-color: var(--_ok);
         color: var(--_ok);
+      }
+      .act:disabled {
+        opacity: 0.7;
+        cursor: progress;
+      }
+      .err {
+        margin-top: 6px;
+        font-size: 11px;
+        color: var(--_na);
       }
       .act:focus-visible {
         outline: 2px solid var(--_acc);
