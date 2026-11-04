@@ -74,6 +74,7 @@ Antes de instalar en un Home Assistant real, cada etapa se valida en la página 
 | 29-10-2026 | v0.2.0 instalada (fondo + agenda) ✅ |
 | 29-10-2026 | Conservar la vista mes + lista del Corporate Dashboard como opción `view` de la tarjeta Calendario; encabezado con modo subpágina |
 | 29-10-2026 | El indicador "Sala de Reuniones disponible" se generalizará después como **indicador de recurso** opcional |
+| 04-11-2026 | v0.15.1: riego: **Regar ahora / Detener** usan el interruptor *Manual watering* de Hydrawise, botones con **Enviando…** y el error visible en la tarjeta; opción **Mostrar la agenda** en el editor del panel |
 | 03-11-2026 | v0.15.0: **tarjeta de riego** (`inventa-irrigation-card`) para Hunter Hydrawise y cualquier válvula de agua: próximo riego, tiempo restante, regado hoy, agua usada, **Regar ahora / Detener** y programa **Automático**; bloque **Riego** e indicador **Zonas regando** en el panel |
 | 02-11-2026 | v0.14.0: **tarjeta de clima con el diseño del Corporate Dashboard**: perilla del objetivo y rango 16–32°, píldora "Actual", línea de advertencia ("⚠ … sobre el objetivo · revisar equipo", opción `alert`), botones **Apagado / modo** y presets del equipo; luces siempre con ícono de ampolleta |
 | 02-11-2026 | v0.13.0: **corrección automática de climas que reportan mal** (regla para cualquier entidad, no solo Tuya): se detecta por la temperatura máxima; aplica en tarjeta de clima, resumen, avisos y asistente; el campo del editor queda solo para forzarla |
