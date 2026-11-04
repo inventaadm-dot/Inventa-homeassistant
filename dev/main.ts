@@ -199,12 +199,9 @@ const hass: HomeAssistant = {
     if (d === 'switch' && (s === 'turn_on' || s === 'turn_off')) next = { ...cur, state: s === 'turn_on' ? 'on' : 'off' };
     if (d === 'climate' && s === 'set_temperature') next = { ...cur, attributes: { ...cur.attributes, temperature: data.temperature } };
     // Como HA: un objeto hass nuevo en cada cambio (sin mutar el anterior).
-    const extra: Record<string, any> = {};
-    // Hydrawise: el riego manual abre la válvula de la zona.
-    const zone = id.match(/^switch\.(.+)_manual_watering$/)?.[1];
-    const valve = zone && els[0].hass.states[`valve.${zone}`];
-    if (valve) extra[valve.entity_id] = { ...valve, state: next.state === 'on' ? 'open' : 'closed' };
-    const h = { ...els[0].hass, states: { ...els[0].hass.states, ...extra, [id]: next } };
+    // Como Hydrawise: solo cambia la entidad tocada; la válvula se entera en la próxima consulta.
+    if (next !== cur && next.state !== cur.state) next = { ...next, last_changed: new Date().toISOString() };
+    const h = { ...els[0].hass, states: { ...els[0].hass.states, [id]: next } };
     els.forEach((el) => (el.hass = h));
   },
   callWS: async (msg: any) => {
