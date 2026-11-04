@@ -33,6 +33,8 @@ export interface InventaStrategyConfig {
   logo_dark?: string;
   subtitle?: string;
   calendar_entities?: string[];
+  /** Agenda al final del panel (por defecto sí). */
+  show_agenda?: boolean;
   weather_entity?: string;
   /** Equipos a mostrar (cualquier tipo); cada uno va a su bloque, en este orden. */
   entities?: string[];
@@ -187,8 +189,8 @@ export function generateDashboard(config: InventaStrategyConfig, hass?: HomeAssi
   if (!chosen.length) {
     sections.push({ type: 'grid', column_span: 4, cards: [{ type: 'markdown', content: L('empty_panel'), grid_options: { columns: 'full' } }] });
   }
-  // Pie del panel: la agenda, siempre al final.
-  sections.push({
+  // Pie del panel: la agenda, al final (se puede ocultar en el editor).
+  if (config.show_agenda !== false) sections.push({
     type: 'grid',
     column_span: 4,
     cards: [

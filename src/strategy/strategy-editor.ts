@@ -36,6 +36,7 @@ const SCHEMA = [
   { name: 'subtitle', selector: { text: {} } },
   { name: 'weather_entity', selector: { entity: { domain: 'weather' } } },
   { name: 'calendar_entities', selector: { entity: { domain: 'calendar', multiple: true } } },
+  { name: 'show_agenda', selector: { boolean: {} } },
   { name: 'entities', selector: { entity: { multiple: true } } },
   { name: 'assist_fallback', selector: { boolean: {} } },
   {
@@ -128,7 +129,7 @@ export class InventaStrategyEditor extends LitElement {
 
   protected render() {
     if (!this._config) return nothing;
-    const data = { scale_factor: 5, ...this._config };
+    const data = { scale_factor: 5, show_agenda: true, ...this._config };
     return html`
       <p class="intro">${t(this.hass, 'strategy_intro')}</p>
       ${this._renderLogo('logo')} ${this._renderLogo('logo_dark')}
