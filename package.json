@@ -1,6 +1,6 @@
 {
   "name": "inventa-cards",
-  "version": "0.15.1",
+  "version": "0.15.2",
   "description": "Tarjetas Lovelace para Home Assistant: diseño limpio, modo oscuro/claro y editor visual.",
   "private": true,
   "type": "module",
