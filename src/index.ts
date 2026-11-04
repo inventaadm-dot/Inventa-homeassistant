@@ -20,7 +20,7 @@ import './cards/vacuum/vacuum-card';
 import './cards/irrigation/irrigation-card';
 import './strategy/dashboard-strategy';
 
-const VERSION = '0.15.1';
+const VERSION = '0.15.2';
 
 declare global {
   interface Window {
