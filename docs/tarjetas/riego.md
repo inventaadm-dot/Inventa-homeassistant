@@ -31,9 +31,13 @@ se apagan solas.
 
 | Botón | Acción en Home Assistant |
 |---|---|
-| **Regar ahora** | `valve.open_valve` (Hydrawise riega con el tiempo por defecto de la zona) |
-| **Detener** | `valve.close_valve` |
+| **Regar ahora** | Hydrawise: enciende *Manual watering* (riega con el tiempo fijo de la integración). Otras válvulas: `valve.open_valve` |
+| **Detener** | Hydrawise: apaga *Manual watering*. Otras válvulas: `valve.close_valve` |
 | **Automático** (verde = activo) | Enciende o apaga el interruptor *Automatic watering*. Apagado = programa **suspendido** (Hydrawise lo suspende por un año hasta volver a activarlo) |
+
+Al tocar un botón aparece **Enviando…** hasta que el equipo responde (Hydrawise trabaja por internet
+y puede tardar unos segundos). Si Home Assistant rechaza la orden, el motivo aparece en rojo en la
+tarjeta.
 
 **Tocar / mantener:** tocar la tarjeta **no riega** (para evitar riegos por error); para ver los
 detalles de Home Assistant, **mantén presionado** (½ s) o usa clic derecho.
@@ -57,4 +61,4 @@ Agrega las válvulas de las zonas en **Equipos a mostrar**: van al bloque **Rieg
 interruptores de riego de Hydrawise no se mezclan con las luces.
 
 ---
-*Última revisión: 03-11-2026 (v0.15.0)*
+*Última revisión: 04-11-2026 (v0.15.1)*

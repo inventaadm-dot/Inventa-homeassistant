@@ -66,6 +66,9 @@ view: full
 - **Actualización:** cada 5 minutos y cada vez que un evento empieza o termina.
 - El botón ↗ abre el calendario completo de Home Assistant.
 - **A lo ancho** (≥ 720 px, como el pie del panel Inventa) los días se ordenan en columnas.
+- **En el panel Inventa** la agenda va al final; se puede quitar en el editor del panel (✏️) con
+  **Mostrar la agenda al final del panel** (`show_agenda: false`). El botón 📅 del encabezado sigue
+  abriendo el calendario.
 
 ## Receta: vista "Calendario" del panel
 
