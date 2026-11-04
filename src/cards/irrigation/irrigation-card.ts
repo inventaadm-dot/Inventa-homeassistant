@@ -159,9 +159,15 @@ export class InventaIrrigationCard extends LitElement {
 
   /** ¿Está regando? Válvula abierta, interruptor manual encendido o sensor "regando". */
   private _running(): boolean {
-    const v = this._st('valve');
-    if (v && !isUnavailable(v)) return VALVE_RUNNING.includes(v.state);
-    return this._st('manual')?.state === 'on' || this._st('running')?.state === 'on' || (this._num('remaining') || 0) > 0;
+    // Hydrawise: al tocar "Regar ahora" el interruptor manual cambia al instante, pero
+    // la válvula recién se entera en la próxima consulta (cada 5 min). Manda el que
+    // cambió más recién, para que el botón pase a "Detener" de inmediato.
+    const sources = [this._st('valve'), this._st('manual')].filter((s): s is HassEntity => !!s && !isUnavailable(s));
+    if (sources.length) {
+      const last = sources.reduce((a, b) => (Date.parse(b.last_changed) > Date.parse(a.last_changed) ? b : a));
+      return last.entity_id.startsWith('valve.') ? VALVE_RUNNING.includes(last.state) : last.state === 'on';
+    }
+    return this._st('running')?.state === 'on' || (this._num('remaining') || 0) > 0;
   }
 
   /**
