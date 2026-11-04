@@ -118,6 +118,7 @@ const STRINGS = {
     st_icon: 'Ícono (si no hay logo)',
     st_subtitle: 'Subtítulo',
     st_weather_entity: 'Tiempo',
+    st_show_agenda: 'Mostrar la agenda al final del panel',
     st_calendar_entities: 'Calendarios (vacío = todos)',
     st_scaled_climates: 'Forzar corrección (solo si no se corrige sola)',
     st_scale_factor: 'Factor de escala',
@@ -242,6 +243,8 @@ const STRINGS = {
     ir_start: 'Regar ahora',
     ir_schedule: 'Automático',
     ir_show_schedule: 'Mostrar el programa automático',
+    ir_sending: 'Enviando…',
+    ir_failed: 'No se pudo: {msg}',
   },
   en: {    my_home: 'My Home',
     good_morning: 'Good morning',
@@ -356,6 +359,7 @@ const STRINGS = {
     st_icon: 'Icon (when no logo)',
     st_subtitle: 'Subtitle',
     st_weather_entity: 'Weather',
+    st_show_agenda: 'Show the agenda at the bottom of the dashboard',
     st_calendar_entities: 'Calendars (empty = all)',
     st_scaled_climates: 'Force correction (only if not auto-corrected)',
     st_scale_factor: 'Scale factor',
@@ -477,6 +481,8 @@ const STRINGS = {
     ir_start: 'Water now',
     ir_schedule: 'Automatic',
     ir_show_schedule: 'Show the automatic schedule',
+    ir_sending: 'Sending…',
+    ir_failed: 'Failed: {msg}',
   },
 };
 export type StringKey = keyof typeof STRINGS.es;
