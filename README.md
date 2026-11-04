@@ -42,7 +42,7 @@ Hay dos formas: **por HACS** (recomendada si el repositorio es público en GitHu
 No hay que tocar el `?v=`; HACS lo maneja.
 
 > **Para quien publica:** el repositorio debe tener `hacs.json` en la raíz y cada versión
-> publicada como **Release** de GitHub (por ejemplo `v0.15.0`) con el archivo
+> publicada como **Release** de GitHub (por ejemplo `v0.15.1`) con el archivo
 > `inventa-cards.js` adjunto.
 
 ### Opción B — Manual
@@ -53,13 +53,13 @@ No hay que tocar el `?v=`; HACS lo maneja.
    (con el complemento *File editor*, *Studio Code Server* o *Samba*).
    `/config/www/` se publica como `/local/`.
 3. **Ajustes → Paneles → ⋮ → Recursos → Añadir recurso**
-   - URL: `/local/inventa-cards/inventa-cards.js?v=0.15.0`
+   - URL: `/local/inventa-cards/inventa-cards.js?v=0.15.1`
    - Tipo: **Módulo JavaScript**
 4. Recarga el navegador (Ctrl + Shift + R).
 5. **Ajustes → Paneles → + Añadir panel → Paneles de la comunidad → Inventa.** Listo, sin código.
 
 **Al actualizar:** reemplaza el archivo y cambia el `?v=` del recurso por la versión nueva
-(por ejemplo `?v=0.15.0`); si no, los navegadores siguen usando la versión anterior.
+(por ejemplo `?v=0.15.1`); si no, los navegadores siguen usando la versión anterior.
 
 > No mezcles ambas formas: si instalas por HACS, borra el recurso manual `/local/inventa-cards/…`
 > para que la tarjeta no se cargue dos veces.
